@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class GradeBook {
@@ -84,6 +87,14 @@ public class GradeBook {
                     break;
                 case "4":
                     // Challenge: write code to save the grades to grades.txt
+                    try (PrintWriter writer = new PrintWriter(new File("grades.txt"))) {
+                        writer.println(students.length);
+                        for (Student student : students) {
+                            writer.printf("%s,%s,%.0f%n", student.getFirstName(), student.getLastName(), student.getGrade());
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Failed to save updates to 'grades.txt'");
+                    }
                     System.out.println("Goodbye!");
                     return;
 
