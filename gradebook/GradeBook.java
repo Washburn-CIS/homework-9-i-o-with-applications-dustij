@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class GradeBook {
@@ -7,6 +10,31 @@ public class GradeBook {
         Scanner input = new Scanner(System.in);
 
         // TODO: initialize students from contents of grades.txt file
+        try (BufferedReader br = new BufferedReader(new FileReader("grades.txt"))) {
+            int numberOfStudentsInFile = Integer.parseInt(br.readLine());
+            students = new Student[numberOfStudentsInFile];
+            
+            String studentData;
+            int i = 0;
+            while ((studentData = br.readLine()) != null) {
+                String[] data = studentData.split(",");
+                
+                String firstName = data[0];
+                String lastName = data[1];
+                try {
+                    double grade = Double.parseDouble(data[2]);
+                    students[i] = new Student(firstName, lastName, grade);
+                    i++;
+                } catch (NumberFormatException e) {
+                    System.out.println("Error parsing student grade from 'grades.txt' -> " + firstName + " " + lastName);
+                    System.exit(1);
+                }
+
+            }
+        } catch (IOException e) {
+            System.out.println("An error occured while trying to read file 'grades.txt'");
+            System.exit(1);
+        }
 
         System.out.println("Welcome to the CM111 Grade Book App!");
 
@@ -14,7 +42,8 @@ public class GradeBook {
             System.out.println("\nPlease make a selection:\n");
             System.out.println("1) List Class Grades");
             System.out.println("2) Update Grade");
-            System.out.println("3) Exit");
+            System.out.println("3) Calculate Exam Average");
+            System.out.println("4) Exit");
             System.out.print("\nPlease choose an option: ");
             String choice = input.nextLine();
             System.out.println();
@@ -44,6 +73,16 @@ public class GradeBook {
                     System.out.println("Student not found");
                     break;
                 case "3":
+                    System.out.print("Enter grades separated by spaces: ");
+                    String[] strGrades = input.nextLine().split(" ");
+                    int[] intGrades = new int[strGrades.length];
+                    for (int i = 0; i < intGrades.length; i++) {
+                        intGrades[i] = Integer.parseInt(strGrades[i]);
+                    }
+                    int avgGrade = Student.getExamAverage(intGrades);
+                    System.out.println("Exam average grade is: " + avgGrade);
+                    break;
+                case "4":
                     // Challenge: write code to save the grades to grades.txt
                     System.out.println("Goodbye!");
                     return;
