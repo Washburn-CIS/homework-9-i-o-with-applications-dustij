@@ -47,22 +47,25 @@ public class GradeBook {
             System.out.println("2) Update Grade");
             System.out.println("3) Calculate Exam Average");
             System.out.println("4) Add New Student");
-            System.out.println("5) Exit");
+            System.out.println("5) Delete Student");
+            System.out.println("6) Exit");
             System.out.print("\nPlease choose an option: ");
             String choice = input.nextLine();
             System.out.println();
             switch (choice) {
-                case "1":
+                case "1": // list grades
                     for (Student student : students) {
                         System.out.printf("%s, %s: %f%n", student.getLastName(),
                                 student.getFirstName(), student.getGrade());
                     }
                     break;
-                case "2": {
+                case "2": { // update grade
                     System.out.println("Enter First Name: ");
                     String fname = input.nextLine();
                     System.out.println("Enter Last Name: ");
                     String lname = input.nextLine();
+
+                    boolean gradeUpdated = false;
 
                     for (Student student : students) {
                         if (student.getFirstName().equals(fname)
@@ -70,13 +73,16 @@ public class GradeBook {
                             System.out.println("Enter Grade: ");
                             student.setGrade(Double.parseDouble(input.nextLine()));
                             System.out.println("Grade updated");
-                            continue;
+                            gradeUpdated = true;
+                            break;
                         }
                     }
-                    System.out.println("Student not found");
+                    if (!gradeUpdated) {
+                        System.out.println("Student not found");
+                    }
                     break;
                 }
-                case "3":
+                case "3": // calculate exam average
                     System.out.print("Enter grades separated by spaces: ");
                     String[] strGrades = input.nextLine().split(" ");
                     int[] intGrades = new int[strGrades.length];
@@ -86,11 +92,27 @@ public class GradeBook {
                     int avgGrade = Student.getExamAverage(intGrades);
                     System.out.println("Exam average grade is: " + avgGrade);
                     break;
-                case "4": {
+                case "4": { // add new student
                     System.out.println("Enter First Name: ");
                     String fname = input.nextLine();
                     System.out.println("Enter Last Name: ");
                     String lname = input.nextLine();
+
+                    // no duplicate names
+                    boolean foundDuplicate = false;
+                    for (Student student : students) {
+                        if (student.getFirstName().equals(fname)
+                                && student.getLastName().equals(lname)) {
+                            foundDuplicate = true;
+                            break;
+                        }
+                    }
+
+                    if (foundDuplicate) {
+                        System.out.println("That student already exists");
+                        break;
+                    }
+
                     System.out.println("Enter a grade: ");
                     try {
                         double grade = Double.parseDouble(input.nextLine());
@@ -103,15 +125,47 @@ public class GradeBook {
                                 copyStudents[i] = new Student(fname, lname, grade);
                             }
                         }
-                        // set this students attribute to new array
+                        // set this.students to new array
                         students = copyStudents;
                     } catch (NumberFormatException e) {
                         System.out.println("Please enter a number for the grade.");
                     }
                     break;
                 }
-                case "5":
-                    // Challenge: write code to save the grades to grades.txt
+                case "5": { // delete student
+                    System.out.println("Enter First Name: ");
+                    String fname = input.nextLine();
+                    System.out.println("Enter Last Name: ");
+                    String lname = input.nextLine();
+
+                    boolean studentDeleted = false;
+
+                    for (Student student : students) {
+                        if (student.getFirstName().equals(fname)
+                                && student.getLastName().equals(lname)) {
+                            Student[] copyStudents = new Student[students.length - 1];
+                            int newIndex = 0;
+                            for (int i = 0; i < students.length; i++) {
+                                // copy students over, removing student
+                                if (!students[i].getFirstName().equals(fname)
+                                        && !students[i].getLastName().equals(lname)) {
+                                    copyStudents[newIndex] = students[i];
+                                    newIndex++;
+                                }
+                            }
+                            // set this.students to new array
+                            System.out.println("Student has been deleted");
+                            students = copyStudents;
+                            studentDeleted = true;
+                            break;
+                        }
+                    }
+                    if (!studentDeleted) {
+                        System.out.println("Student not found");
+                    }
+                    break;
+                }
+                case "6": // save and exit
                     try (PrintWriter writer = new PrintWriter(new File("grades.txt"))) {
                         writer.println(students.length);
                         for (Student student : students) {

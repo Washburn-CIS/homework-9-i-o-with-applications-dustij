@@ -1,4 +1,4 @@
 3
 Alan,Turing,100
 Ada,Lovelace,100
-Dusti,Johnson,101
+Dusti,Johnson,100
